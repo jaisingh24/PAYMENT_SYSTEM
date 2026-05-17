@@ -7,7 +7,7 @@ spring:
     name: payment-system
 
   datasource:
-    url: ${MYSQL_PUBLIC_URL}?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://shuttle.proxy.rlwy.net:37037/railway?useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: ${MYSQL_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -24,18 +24,16 @@ spring:
       ddl-auto: update
 
     show-sql: false
-
     open-in-view: false
 
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
 
   data:
     redis:
       host: ${REDISHOST}
-      port: ${REDISPORT}
+      port: ${REDISPORT:6379}
       password: ${REDIS_PASSWORD}
       timeout: 6000
 
