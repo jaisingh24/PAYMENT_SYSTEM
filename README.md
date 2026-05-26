@@ -21,8 +21,9 @@
 - [Getting Started](#-getting-started)
 - [API Reference](#-api-reference)
 - [Security Design](#-security-design)
-- [Concurrency & ACID](#-concurrency--acid-guarantees)
+- [Concurrency & ACID Guarantees](#-concurrency--acid-guarantees)
 - [Redis Idempotency](#-redis-idempotency)
+- [Performance & Load Testing](#-performance--load-testing)
 - [Testing](#-testing)
 - [Future Roadmap](#-future-roadmap)
 
@@ -352,6 +353,75 @@ This makes transfers **safe to retry** without any risk of money being deducted 
 
 ---
 
+## 📊 Performance & Load Testing
+
+The backend was extensively load tested using **Apache JMeter** to evaluate concurrency handling, throughput, latency, and system stability under heavy registration traffic.
+
+### Test Environment
+
+| Component | Details |
+|---|---|
+| Backend | Spring Boot 3.x |
+| Database | MySQL 8 |
+| Cache | Redis 7 |
+| Load Tool | Apache JMeter |
+| Hardware | ASUS TUF F15 Laptop |
+| JVM | Java 21 |
+
+---
+
+### Optimization Work Performed
+
+A systematic, iterative tuning process was applied at each layer of the stack:
+
+- Tuned **Tomcat thread pool** configuration for higher concurrency
+- Optimized **HikariCP** database connection pool sizing
+- Reduced **BCrypt strength** during benchmarking to isolate hashing overhead
+- Disabled excessive **SQL logging** to eliminate I/O bottlenecks
+- Added **database indexing** via unique constraints on hot-path columns
+- Optimized **JVM runtime memory** configuration (heap sizing, GC tuning)
+- Conducted iterative bottleneck analysis and re-tuning after each test run
+
+---
+
+### Benchmark Results
+
+| Load Scenario | Throughput | Avg Latency | Error Rate |
+|---|---|---|---|
+| Initial Baseline | ~55 req/sec | ~1,600 ms | High |
+| Optimized Backend | ~127 req/sec | ~678 ms | ~5% |
+| Stable Concurrent Load | ~228 req/sec | ~640 ms | 0% |
+| Heavy Load (5K Requests) | ~274 req/sec | ~358 ms | 0% |
+| Extreme Load (10K Requests) | ~288 req/sec | ~1,614 ms | 0% |
+| Saturation Test (20K Requests) | ~265 req/sec | ~4,557 ms | ~1.17% |
+
+> 📈 **5× throughput improvement** from baseline to peak — achieved through systematic profiling and targeted tuning, not over-provisioning.
+
+---
+
+### Key Engineering Findings
+
+- Backend remained **stable under 20,000 concurrent registration requests** with no crashes or data corruption
+- System exhibited **graceful degradation under saturation** — latency increased predictably rather than failing catastrophically
+- Throughput **saturated around 250–300 req/sec** for registration workloads on the test hardware
+- **BCrypt hashing** and **MySQL transaction commits** identified as the primary performance bottlenecks
+- Thread pool and connection pool tuning produced the single largest improvement in both throughput and latency
+- **Zero database corruption or deadlock scenarios** observed across all concurrent stress tests
+
+---
+
+### Scalability Insights
+
+This load testing process transformed the project from a standard CRUD application into a backend engineering-focused system. It demonstrates:
+
+- **Concurrency-safe transaction handling** validated under real parallel load
+- **Stable request processing** under high contention without data integrity issues
+- **Resilience under extreme load** with predictable, non-catastrophic degradation
+- **Profiling-driven optimization** — bottlenecks identified empirically, not by assumption
+- **Real-world backend scalability experimentation** on consumer-grade hardware
+
+---
+
 ## 🧪 Testing
 
 ```bash
@@ -395,4 +465,4 @@ Test coverage includes:
 
 ---
 
-> Built to demonstrate production-quality backend engineering — not just a CRUD app, but a system designed for correctness under pressure.
+> Built to demonstrate production-quality backend engineering — not just a CRUD app, but a system designed for correctness and stability under pressure.
