@@ -388,8 +388,8 @@ A systematic, iterative tuning process was applied at each layer of the stack:
 
 | Load Scenario | Throughput | Avg Latency | Error Rate |
 |---|---|---|---|
-| Initial Baseline | ~55 req/sec | ~1,600 ms | High |
-| Optimized Backend | ~127 req/sec | ~678 ms | ~5% |
+| Initial Baseline | ~55 req/sec | ~1,600 ms | 0% |
+| Optimized Backend | ~127 req/sec | ~678 ms | 0% |
 | Stable Concurrent Load | ~228 req/sec | ~640 ms | 0% |
 | Heavy Load (5K Requests) | ~274 req/sec | ~358 ms | 0% |
 | Extreme Load (10K Requests) | ~288 req/sec | ~1,614 ms | 0% |
